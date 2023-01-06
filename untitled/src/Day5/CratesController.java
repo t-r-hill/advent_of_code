@@ -14,6 +14,7 @@ public class CratesController {
         ArrayList<Stack<String>> crates = new ArrayList<>();
         ArrayList<ArrayList<String>> crateInput = new ArrayList<>();
 
+        // Parse input into an arraylist matrix
         try(BufferedReader in = new BufferedReader(new FileReader(fileIn))){
             String line;
             while(!(line = in.readLine()).isBlank()) {
@@ -27,8 +28,10 @@ public class CratesController {
             throw new RuntimeException(e);
         }
 
+        // Create stack for each crate stack in an arraylist
         crateInput.get(crateInput.size() - 1).stream().forEach(i -> crates.add(new Stack<String>()));
 
+        // Populate each crate stack from the arraylist matrix
         for (int i = crateInput.size() - 2; i >= 0; i--){
             ArrayList<String> temp = crateInput.get(i);
             for (int j = 0; j < temp.size(); j++){
@@ -40,6 +43,7 @@ public class CratesController {
 
         System.out.println(crates);
 
+        // Parse move instructions and carry out movements
         try(BufferedReader in = new BufferedReader(new FileReader(fileIn))){
             for (int i = 0; i < crateInput.size() + 1; i++){
                 in.readLine();
@@ -53,13 +57,24 @@ public class CratesController {
 
             while((line = in.readLine()) != null) {
                 if (line.startsWith("move")){
-                    String[] temp = line.split(" ");
-                    numBlocks = Integer.parseInt(temp[1]);
-                    from = Integer.parseInt(temp[3]) - 1;
-                    to = Integer.parseInt(temp[5]) - 1;
+                    String[] instructionsArray = line.split(" ");
+                    numBlocks = Integer.parseInt(instructionsArray[1]);
+                    from = Integer.parseInt(instructionsArray[3]) - 1;
+                    to = Integer.parseInt(instructionsArray[5]) - 1;
+                    Stack<String> tempStack = new Stack<>();
 
                     for (int i = 0; i < numBlocks; i++){
-                        crates.get(to).push(crates.get(from).pop());
+                        tempStack.push(crates.get(from).pop());
+                    }
+
+//                    // Original crane9000
+//                    for (int i = 0; i < numBlocks; i++){
+//                        crates.get(to).push(crates.get(from).pop());
+//                    }
+
+                    // Crane 9001
+                    for (int i = 0; i < numBlocks; i++){
+                        crates.get(to).push(tempStack.pop());
                     }
                 }
             }
@@ -67,7 +82,7 @@ public class CratesController {
             throw new RuntimeException(e);
         }
 
-        String answer;
+        // Calculate message answer by looking at the top of each stack
 
         String message = crates.stream().map(i -> i.peek()).collect(Collectors.joining()).replaceAll("\\[|\\]","");
         System.out.println(message);
